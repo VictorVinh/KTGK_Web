@@ -24,7 +24,6 @@
       .coeff-box{display:flex;align-items:center;gap:4px}
       .controls{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
       .controls .group{display:flex;align-items:center;gap:6px}
-      /* light theme overrides (applied dynamically) */
       .light body, .light :root{}
     </style>
   </head>
@@ -122,13 +121,10 @@
       const gridColor = css.getPropertyValue('--grid').trim() || 'rgba(0,0,0,0.06)';
       const axisColor = css.getPropertyValue('--axis').trim() || 'rgba(0,0,0,0.8)';
       const tickColor = css.getPropertyValue('--tick').trim() || 'rgba(0,0,0,0.9)';
-
-      // grid lines (vertical & horizontal at integer values) - light, subtle
       ctx.save();
       ctx.strokeStyle = gridColor;
       ctx.lineWidth = 1;
       ctx.beginPath();
-      // vertical lines
       const startX = Math.ceil(xmin);
       const endX = Math.floor(xmax);
       for(let x = startX; x <= endX; x++){
