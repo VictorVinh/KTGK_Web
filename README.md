@@ -19,7 +19,7 @@
     button.secondary{background:#444;color:#fff}
     button:hover{filter:brightness(1.12);transform:translateY(-1px)}
 
-    canvas{width:100%;height:850px;border-radius:10px;background:rgba(255,255,255,0.01);margin-top:18px;box-shadow:0 0 15px #0006}
+    canvas{width:100%;height:750px;border-radius:10px;background:rgba(255,255,255,0.01);margin-top:18px;box-shadow:0 0 15px #0006}
 
     #coeffs{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:18px;margin-top:12px;padding:10px 0}
     .coeff-box{display:flex;align-items:center;gap:4px}
@@ -49,8 +49,8 @@
     <div class="group">
       <label>xmin</label><input id="xmin" type="number" value="-10">
       <label>xmax</label><input id="xmax" type="number" value="10">
-      <label>ymin</label><input id="ymin" type="number" value="-100">
-      <label>ymax</label><input id="ymax" type="number" value="100">
+      <label>ymin</label><input id="ymin" type="number" value="-10">
+      <label>ymax</label><input id="ymax" type="number" value="10">
       <label>scale</label><input id="scale" type="number" value="40">
     </div>
 
