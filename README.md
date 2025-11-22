@@ -1,22 +1,34 @@
-# KTGK_Web
 <!doctype html>
 <html lang="vi">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Vẽ đồ thị đa thức bậc 1-5</title>
+  <title>Vẽ đồ thị đa thức bậc 1–5</title>
   <style>
-    :root{--bg:#0f1724;--card:#0b1220;--accent:#60a5fa;--muted:#9ca3af}
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#60a5fa;--muted:#9ca3af;--grid:rgba(255,255,255,0.08);--axis:rgba(255,255,255,0.8);--tick:rgba(255,255,255,0.9)}
     *{box-sizing:border-box;font-family:Inter, system-ui, Arial}
-    body{margin:0;background:#071025;color:#e6eef8;display:flex;flex-direction:column;min-height:100vh}
-    .container{max-width:1000px;margin:24px auto;padding:18px;background:var(--card);border-radius:12px}
-    label{font-size:12px;color:var(--muted)}
-    input{padding:6px;border-radius:6px;border:1px solid #333;background:transparent;color:#e6eef8;width:70px;text-align:center;font-family:'Times New Roman', 'Cambria Math', serif;font-size:16px}
-    select{padding:6px;border-radius:6px;background:transparent;color:#e6eef8}
-    button{padding:8px 12px;border:none;border-radius:8px;background:var(--accent);cursor:pointer}
-    canvas{width:100%;height:750px;border-radius:8px;background:rgba(255,255,255,0.03)}
-    #coeffs{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:18px;margin-top:12px}
+    body{margin:0;background:linear-gradient(135deg,#091426,#0f1c2e);color:#e6eef8;display:flex;flex-direction:column;min-height:100vh}
+    .container{max-width:1000px;margin:32px auto;padding:28px;background:var(--card);border-radius:16px;box-shadow:0 0 25px #0008;backdrop-filter:blur(6px)}
+    h2{text-align:center;margin-top:0;font-size:28px;color:#90c8ff;text-shadow:0 0 12px #60a5fa55}
+
+    label{font-size:13px;color:var(--muted)}
+    input,select{padding:6px 8px;border-radius:6px;border:1px solid #333;background:#0f1724;color:#e6eef8}
+    input{width:70px;text-align:center;font-family:'Times New Roman','Cambria Math',serif;font-size:16px}
+
+    button{padding:10px 16px;border:none;border-radius:8px;background:var(--accent);cursor:pointer;color:#000;font-weight:600;transition:0.2s}
+    button.secondary{background:#444;color:#fff}
+    button:hover{filter:brightness(1.12);transform:translateY(-1px)}
+
+    canvas{width:100%;height:740px;border-radius:10px;background:rgba(255,255,255,0.01);margin-top:18px;box-shadow:0 0 15px #0006}
+
+    #coeffs{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:18px;margin-top:12px;padding:10px 0}
     .coeff-box{display:flex;align-items:center;gap:4px}
+
+    .controls{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+    .controls .group{display:flex;align-items:center;gap:6px}
+
+    /* light theme overrides (applied dynamically) */
+    .light body, .light :root{}
   </style>
 </head>
 <body>
@@ -33,104 +45,239 @@
 
   <div id="coeffs"></div>
 
-  <div style="display:flex;align-items:center;gap:12px;margin-top:10px">
-    <label>xmin</label><input id="xmin" type="number" value="-10">
-    <label>xmax</label><input id="xmax" type="number" value="10">
-    <label>ymin</label><input id="ymin" type="number" value="-100">
-    <label>ymax</label><input id="ymax" type="number" value="100">
-    <label>scale</label><input id="scale" type="number" value="100">
-    <label>màu</label><input type='color' id='color' value='#60a5fa'>
-    <button id="draw">Vẽ</button>
+  <div class="controls">
+    <div class="group">
+      <label>xmin</label><input id="xmin" type="number" value="-10">
+      <label>xmax</label><input id="xmax" type="number" value="10">
+      <label>ymin</label><input id="ymin" type="number" value="-100">
+      <label>ymax</label><input id="ymax" type="number" value="100">
+      <label>scale</label><input id="scale" type="number" value="40">
+    </div>
+
+    <div class="group">
+      <label>Màu</label><input type='color' id='color' value='#60a5fa'>
+      <button id="draw">Vẽ</button>
+      <button id="theme" class="secondary">Đổi nền</button>
+    </div>
   </div>
+
   <canvas id="plot"></canvas>
 </div>
+
 <script>
+// --- UI rendering for coefficient inputs ---
 const coeffContainer = document.getElementById("coeffs");
 const degreeSelect = document.getElementById("degree");
 function renderCoeffInputs(){
   const deg = parseInt(degreeSelect.value);
   let html = `<div style="display:flex;align-items:center;flex-wrap:wrap;gap:10px"><span>y = </span>`;
-
   for(let i = deg; i >= 0; i--){
-    html += `<div class='coeff-box'><input id='a${i}' value='0'>`;
+    html += `<div class='coeff-box'><input id='a${i}' value='0' type='number' step='any'>`;
     if(i > 1) html += `<label>x<sup>${i}</sup></label>`;
     else if(i === 1) html += `<label>x</label>`;
-    // x^0 thì bỏ label
     html += `</div>`;
     if(i !== 0) html += `<span> + </span>`;
   }
-
   html += `</div>`;
   coeffContainer.innerHTML = html;
 }
 renderCoeffInputs();
 degreeSelect.addEventListener('change', renderCoeffInputs);
+
+// --- Canvas & drawing utilities ---
 const canvas = document.getElementById('plot');
 const ctx = canvas.getContext('2d');
+let themeIsDark = true; // track theme state
+
+function setTheme(dark){
+  const r = document.documentElement;
+  if(dark){
+    r.style.setProperty('--bg','#0f1724');
+    r.style.setProperty('--card','#0b1220');
+    r.style.setProperty('--axis','rgba(255,255,255,0.8)');
+    r.style.setProperty('--tick','rgba(255,255,255,0.95)');
+    r.style.setProperty('--grid','rgba(255,255,255,0.06)');
+    document.body.style.background = 'linear-gradient(135deg,#091426,#0f1c2e)';
+    document.querySelectorAll('input,select').forEach(el=>{el.style.background='#0f1724';el.style.color='#e6eef8'});
+  } else {
+    r.style.setProperty('--bg','#ffffff');
+    r.style.setProperty('--card','#f6f7fb');
+    r.style.setProperty('--axis','rgba(0,0,0,0.8)');
+    r.style.setProperty('--tick','rgba(0,0,0,0.9)');
+    r.style.setProperty('--grid','rgba(0,0,0,0.06)');
+    document.body.style.background = '#ffffff';
+    document.querySelectorAll('input,select').forEach(el=>{el.style.background='#ffffff';el.style.color='#111'});
+  }
+  themeIsDark = dark;
+  // adjust container background directly for contrast
+  document.querySelector('.container').style.background = dark ? 'var(--card)' : '#ffffff';
+  document.querySelector('.container').style.color = dark ? '#e6eef8' : '#0b1220';
+}
+
+// initialize theme
+setTheme(true);
+
 function resize(){
   const rect = canvas.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
-  canvas.width = rect.width * dpr;
-  canvas.height = rect.height * dpr;
+  canvas.width = Math.max(300, rect.width * dpr);
+  canvas.height = Math.max(200, rect.height * dpr);
   ctx.setTransform(dpr,0,0,dpr,0,0);
   draw();
 }
 window.addEventListener('resize', resize);
+
 function worldToScreen(x,y,opts){
-  const {scale,width,height} = opts;
-  const sx = width/2 + x*scale;
-  const sy = height/2 - y*scale;
-  return [sx,sy];
+  const {scale,width,height,xmin,xmax,ymin,ymax} = opts;
+  // center the world so (0,0) maps to center of canvas relative to xmin/xmax & ymin/ymax
+  const cx = width/2;
+  const cy = height/2;
+  return [cx + x*scale, cy - y*scale];
 }
 
 function drawAxes(opts){
-  const {scale,width,height} = opts;
-  ctx.strokeStyle = "rgba(255,255,255,0.12)";
+  const {scale,width,height,xmin,xmax,ymin,ymax} = opts;
+  const css = getComputedStyle(document.documentElement);
+  const gridColor = css.getPropertyValue('--grid').trim() || 'rgba(0,0,0,0.06)';
+  const axisColor = css.getPropertyValue('--axis').trim() || 'rgba(0,0,0,0.8)';
+  const tickColor = css.getPropertyValue('--tick').trim() || 'rgba(0,0,0,0.9)';
+
+  // grid lines (vertical & horizontal at integer values) - light, subtle
+  ctx.save();
+  ctx.strokeStyle = gridColor;
+  ctx.lineWidth = 1;
   ctx.beginPath();
-  for(let x=-width; x<=width; x+=50) ctx.rect(x,0,0,height);
+  // vertical lines
+  const startX = Math.ceil(xmin);
+  const endX = Math.floor(xmax);
+  for(let x = startX; x <= endX; x++){
+    const [sx] = worldToScreen(x,0,opts);
+    ctx.moveTo(sx,0); ctx.lineTo(sx,height);
+  }
+  // horizontal lines
+  const startY = Math.ceil(ymin);
+  const endY = Math.floor(ymax);
+  for(let y = startY; y <= endY; y++){
+    const [,sy] = worldToScreen(0,y,opts);
+    ctx.moveTo(0,sy); ctx.lineTo(width,sy);
+  }
   ctx.stroke();
+
+  // axes (x=0 and y=0) thicker
+  ctx.strokeStyle = axisColor;
+  ctx.lineWidth = 2.2;
   ctx.beginPath();
-  ctx.strokeStyle = "rgba(255,255,255,0.8)";
-  ctx.moveTo(0,height/2); ctx.lineTo(width,height/2);
-  ctx.moveTo(width/2,0); ctx.lineTo(width/2,height);
+  const [x0,y0] = worldToScreen(0,0,opts);
+  ctx.moveTo(0,y0); ctx.lineTo(width,y0);
+  ctx.moveTo(x0,0); ctx.lineTo(x0,height);
   ctx.stroke();
+
+  // tick marks and labels - make labels bold and with contrasting box behind for readability
+  ctx.font = 'bold 14px Inter, Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = tickColor;
+  ctx.strokeStyle = 'transparent';
+
+  // x ticks
+  for(let x = startX; x <= endX; x++){
+    const [sx,sy] = worldToScreen(x,0,opts);
+    ctx.beginPath();
+    ctx.moveTo(sx, sy-6); ctx.lineTo(sx, sy+6);
+    ctx.strokeStyle = tickColor; ctx.lineWidth = 2; ctx.stroke();
+
+    if(x !== 0){
+      // draw label with small background rectangle to improve contrast
+      const txt = String(x);
+      const tw = ctx.measureText(txt).width;
+      ctx.fillStyle = themeIsDark ? 'rgba(0,0,0,0.65)' : 'rgba(255,255,255,0.75)';
+      ctx.fillRect(sx - tw/2 - 6, sy + 8, tw + 12, 18);
+      ctx.fillStyle = themeIsDark ? '#fff' : '#000';
+      ctx.fillText(txt, sx, sy + 11);
+    }
+  }
+
+  // y ticks (labels to the right of the tick)
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  for(let y = startY; y <= endY; y++){
+    const [sx,sy] = worldToScreen(0,y,opts);
+    ctx.beginPath();
+    ctx.moveTo(sx-6, sy); ctx.lineTo(sx+6, sy);
+    ctx.strokeStyle = tickColor; ctx.lineWidth = 2; ctx.stroke();
+
+    if(y !== 0){
+      const txt = String(y);
+      const tw = ctx.measureText(txt).width;
+      ctx.fillStyle = themeIsDark ? 'rgba(0,0,0,0.65)' : 'rgba(255,255,255,0.75)';
+      ctx.fillRect(sx + 10, sy - 10, tw + 12, 20);
+      ctx.fillStyle = themeIsDark ? '#fff' : '#000';
+      ctx.fillText(txt, sx + 16, sy);
+    }
+  }
+
+  ctx.restore();
 }
+
 function draw(){
-  const xmin = parseFloat(document.getElementById('xmin').value);
-  const xmax = parseFloat(document.getElementById('xmax').value);
-  const ymin = parseFloat(document.getElementById('ymin').value);
-  const ymax = parseFloat(document.getElementById('ymax').value);
-  const scale = parseFloat(document.getElementById('scale').value);
-  const samples = Math.round((xmax - xmin) * 100);
+  // read inputs
+  const xmin = parseFloat(document.getElementById('xmin').value) || -10;
+  const xmax = parseFloat(document.getElementById('xmax').value) || 10;
+  const ymin = parseFloat(document.getElementById('ymin').value) || -100;
+  const ymax = parseFloat(document.getElementById('ymax').value) || 100;
+  const scale = parseFloat(document.getElementById('scale').value) || 40;
+  const color = document.getElementById('color').value || '#60a5fa';
+
   const width = canvas.clientWidth;
   const height = canvas.clientHeight;
+  // clear
   ctx.clearRect(0,0,width,height);
-  drawAxes({scale,width,height});
-  const deg = parseInt(degreeSelect.value);
+
+  const opts = {scale,width,height,xmin,xmax,ymin,ymax};
+  drawAxes(opts);
+
+  const deg = parseInt(degreeSelect.value) || 1;
   const a = [];
-  for(let i=0;i<=deg;i++){ a[i] = parseFloat(document.getElementById(`a${i}`).value)||0; }
+  for(let i=0;i<=deg;i++) a[i] = parseFloat(document.getElementById(`a${i}`).value) || 0;
 
   function poly(x){
+    // Horner's method but ensure correct order: a_deg x^deg + ... + a0
     let s = 0;
-    for(let i=deg;i>=0;i--) s = s*x + a[i];
+    for(let i = deg; i >= 0; i--) s = s * x + a[i];
     return s;
   }
 
+  // draw polynomial
   ctx.beginPath();
-  ctx.strokeStyle = document.getElementById('color').value;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.5;
+
+  const samples = Math.max(200, Math.round((xmax - xmin) * 60));
   let first = true;
   for(let i=0;i<=samples;i++){
-    let t = i/samples;
-    let x = xmin + t*(xmax-xmin);
-    let y = poly(x);
-    const [sx,sy] = worldToScreen(x,y,{scale,width,height});
-    if(first){ ctx.moveTo(sx,sy); first=false;} else ctx.lineTo(sx,sy);
+    const t = i / samples;
+    const x = xmin + t * (xmax - xmin);
+    const y = poly(x);
+    const [sx,sy] = worldToScreen(x,y,opts);
+    if(first){ ctx.moveTo(sx,sy); first=false; }
+    else ctx.lineTo(sx,sy);
   }
   ctx.stroke();
 }
 
+// wire up events
 document.getElementById('draw').addEventListener('click', draw);
-resize();
+window.addEventListener('load', resize);
+window.addEventListener('orientationchange', resize);
+
+// theme toggle button
+document.getElementById('theme').addEventListener('click', ()=>{
+  setTheme(!themeIsDark);
+  draw();
+});
+
+// initial draw after small delay to ensure layout measured
+setTimeout(()=>{ resize(); }, 50);
 </script>
 
 </body>
