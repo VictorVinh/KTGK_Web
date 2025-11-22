@@ -19,7 +19,7 @@
     button.secondary{background:#444;color:#fff}
     button:hover{filter:brightness(1.12);transform:translateY(-1px)}
 
-    canvas{width:100%;height:800px;border-radius:10px;background:rgba(255,255,255,0.01);margin-top:18px;box-shadow:0 0 15px #0006}
+    canvas{width:100%;height:850px;border-radius:10px;background:rgba(255,255,255,0.01);margin-top:18px;box-shadow:0 0 15px #0006}
 
     #coeffs{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:18px;margin-top:12px;padding:10px 0}
     .coeff-box{display:flex;align-items:center;gap:4px}
