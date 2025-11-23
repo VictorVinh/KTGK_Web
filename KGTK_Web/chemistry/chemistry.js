@@ -17,6 +17,78 @@ class ChemistryLab {
 
     this.recipes = [
       {
+  inputs: { 'Na': 1, 'H': 1, 'C': 1, 'O': 3 },
+  product: 'NaHCO₃',
+  name: 'Sodium Bicarbonate',
+  desc: 'Natri bicacbonat - Baking soda (tác dụng khử axit, làm bánh, tẩy rửa nhẹ)',
+  color: '#ffeaa7',
+  type: 'solid'
+},
+{
+  inputs: { 'Na': 1, 'N': 1, 'O': 3 },
+  product: 'NaNO₃',
+  name: 'Sodium Nitrate',
+  desc: 'Natri nitrat - phân bón, chất oxy hóa',
+  color: '#fd79a8',
+  type: 'solid'
+},
+{
+  inputs: { 'N': 1, 'H': 4, 'Cl': 1 },
+  product: 'NH₄Cl',
+  name: 'Ammonium Chloride',
+  desc: 'Amoni clorua - muối amoni (dùng trong pin khô, phân bón, tinh chế kim loại)',
+  color: '#74b9ff',
+  type: 'solid'
+},
+{
+  inputs: { 'Na': 1, 'C': 2, 'H': 3, 'O': 2 },
+  product: 'CH₃COONa',
+  name: 'Sodium Acetate',
+  desc: 'Natri axetat - muối hữu cơ của axit axetic (đệm, chế độ làm nóng tự giải phóng)',
+  color: '#ffd79b',
+  type: 'solid'
+},
+{
+  inputs: { 'C': 2, 'H': 5, 'N': 1, 'O': 2 },
+  product: 'C₂H₅NO₂',
+  name: 'Glycine',
+  desc: 'Glycine - axit amin đơn giản nhất (thành phần protein, chất đệm)',
+  color: '#a29bfe',
+  type: 'solid'
+},
+{
+  inputs: { 'C': 2, 'H': 5, 'N': 1, 'O': 1 },
+  product: 'C₂H₅NO',
+  name: 'Acetamide',
+  desc: 'Acetamide - amide đơn (dung môi, trung gian tổng hợp hữu cơ)',
+  color: '#81ecec',
+  type: 'solid'
+},
+{
+  inputs: { 'C': 2, 'H': 3, 'Cl': 1, 'O': 2 },
+  product: 'C₂H₃ClO₂',
+  name: 'Chloroacetic Acid',
+  desc: 'Axit chloroacetic - chất hoạt tính để tổng hợp hữu cơ (tính ăn mòn cao)',
+  color: '#ff7675',
+  type: 'solid'
+},
+{
+  inputs: { 'C': 1, 'H': 4, 'N': 2, 'O': 1 },
+  product: 'CH₄N₂O',
+  name: 'Urea',
+  desc: 'Ure - phân bón và nguyên liệu công nghiệp (rất hòa tan, chứa N cao)',
+  color: '#55efc4',
+  type: 'solid'
+},
+{
+  inputs: { 'Na': 1, 'O': 1, 'H': 1 },
+  product: 'NaOH',
+  name: 'Sodium Hydroxide',
+  desc: 'Natri hiđroxit - xút ăn da, tẩy rửa, phòng thí nghiệm (rất bazơ, ăn mòn)',
+  color: '#636e72',
+  type: 'solid'
+}
+      {
         inputs: { 'H': 2, 'O': 1 },
         product: 'H₂O',
         name: 'Nước Tinh Khiết',
@@ -461,4 +533,5 @@ window.ChemistryModule = {
     }
     window.currentChemLab = new ChemistryLab();
   }
+
 };
