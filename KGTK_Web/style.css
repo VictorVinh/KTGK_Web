@@ -1,0 +1,191 @@
+@import url('universal.css');
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: var(--dark);  /* lấy màu từ config chung trong universal.css */
+}
+
+.app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.app-header {
+    text-align: center;
+    color: white;
+    margin-bottom: 40px;
+}
+
+.header-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.logo-container {
+    margin-bottom: 20px;
+}
+
+.app-logo {
+    height: 80px; 
+    width: auto;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.app-logo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.app-logo:active {
+    transform: scale(0.95);
+}
+
+.app-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.app-header p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.subject-selection {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.subject-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 3px solid transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.subject-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary);
+}
+
+.subject-icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: var(--space-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-lg);
+    background: #fff; 
+    padding: var(--space-md);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
+}
+
+.subject-icon img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+.subject-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: var(--dark);
+}
+
+.subject-card p {
+    color: #64748b;
+    line-height: 1.6;
+}
+
+.subject-content {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: var(--shadow);
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.coming-soon {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.coming-soon h2 {
+    color: var(--primary);
+    margin-bottom: 20px;
+}
+
+.error-message {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--danger);
+    border-radius: 8px;
+    padding: 20px;
+    color: var(--danger);
+}
+
+.error-message h3 {
+    margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+    .app-container {
+        padding: 10px;
+    }
+
+    .subject-selection {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .subject-content {
+        padding: 20px;
+        min-height: 500px;
+    }
+
+    .subject-icon {
+        width: 70px;
+        height: 70px;
+    }
+
+    .app-header h1 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .subject-icon {
+        width: 60px;
+        height: 60px;
+        padding: 10px;
+    }
+
+    .app-logo {
+        height: 50px; 
+    }
+
+    .app-header h1 {
+        font-size: 1.8rem;
+    }
+}

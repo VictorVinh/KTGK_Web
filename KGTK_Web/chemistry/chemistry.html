@@ -1,0 +1,47 @@
+<div class="chemistry-lab">
+  <h2>Phòng thí nghiệm Phản ứng</h2>
+  
+  <div class="lab-container">
+    <div id="chemistry-canvas">
+      <div class="beaker-container">
+        <div class="liquid" id="liquid"></div>
+        <div id="bubbles-container"></div>
+      </div>
+
+      <div class="lab-area" id="lab-area-2d">
+        </div>
+      
+      <div id="lab-notification" style="position: absolute; top: 20px; background: rgba(0,0,0,0.7); color: white; padding: 10px 20px; border-radius: 20px; display: none; opacity: 0; transition: opacity 0.3s;"></div>
+    </div>
+    
+    <div class="reaction-panel">
+      <div class="element-library">
+        <h4>Kho nguyên tố (Click để thêm)</h4>
+        <div class="element-grid">
+          <button class="element-btn" data-element="H" style="background: #ef4444;">H</button>
+          <button class="element-btn" data-element="O" style="background: #3b82f6;">O</button>
+          <button class="element-btn" data-element="C" style="background: #64748b;">C</button>
+          <button class="element-btn" data-element="Na" style="background: #eab308;">Na</button>
+          <button class="element-btn" data-element="Cl" style="background: #10b981;">Cl</button>
+          <button class="element-btn" data-element="N" style="background: #8b5cf6;">N</button>
+        </div>
+      </div>
+
+      <div class="lab-controls">
+        <button id="mix-btn" class="lab-button primary" style="flex: 2;">Kích hoạt phản ứng</button>
+        <button id="clear-lab" class="lab-button danger" style="flex: 1;">Xóa</button>
+      </div>
+
+      <div class="recipe-book">
+        <h4>Công thức cần nhớ</h4>
+        <div class="recipe-item"><span>2 H + 1 O</span> <span>➔ Nước (H₂O)</span></div>
+        <div class="recipe-item"><span>1 Na + 1 Cl</span> <span>➔ Muối (NaCl)</span></div>
+        <div class="recipe-item"><span>1 C + 2 O</span> <span>➔ Khí CO₂</span></div>
+        <div class="recipe-item"><span>1 N + 3 H</span> <span>➔ Ammonia (NH₃)</span></div>
+      </div>
+
+      <div id="reaction-result" class="reaction-message" style="display: none;">
+        </div>
+    </div>
+  </div>
+</div>
