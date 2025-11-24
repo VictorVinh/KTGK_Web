@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Trang chủ - Hệ thống học tập</title>
+    <link rel="icon" type="image/png" href="Images/pixels.png" />
+    
+    <link rel="stylesheet" href="universal.css" />
+    <link rel="stylesheet" href="style.css" />
+
+    <script src="progress-tracker.js"></script>
+    <script src="auth/auth.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = localStorage.getItem('currentUser');
+            const authOverlay = document.getElementById('auth-overlay');
+            const mainApp = document.getElementById('main-app');
+            
+            if (currentUser) {
+                authOverlay.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+                
+                const displayName = document.getElementById('user-display-name');
+                if (displayName) displayName.innerText = currentUser;
+                
+                if (typeof progressTracker !== 'undefined') {
+                    progressTracker.updateDisplay();
+                }
+                
+                const facts = [
+                    "Mật ong là thực phẩm duy nhất không bao giờ bị hỏng.",
+                    "Nước nóng đóng băng nhanh hơn nước lạnh (Hiệu ứng Mpemba).",
+                    "Một thìa vật chất trong sao nơ-tron nặng khoảng 6 tỷ tấn.",
+                    "Chuối có chứa phóng xạ nhẹ do kali-40.",
+                    "Oxy lỏng có màu xanh nhạt.",
+                    "Cơ thể người có đủ Carbon để làm 9000 cây bút chì.",
+                    "Bạn không thể hắt hơi mà vẫn mở mắt."
+                ];
+                const randomFact = facts[Math.floor(Math.random() * facts.length)];
+                document.getElementById('daily-fact').innerText = randomFact;
+            }
+        });
+    </script>
+</head>
+<body>
+
+    <div id="auth-overlay" class="auth-overlay">
+        <div class="auth-card" id="auth-box">
+            <div class="auth-header">
+                <img src="Images/logo.png" alt="Logo" class="auth-logo">
+                <h2 id="auth-title">Đăng nhập</h2>
+                <p id="auth-subtitle">Chào mừng bạn quay trở lại!</p>
+            </div>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label>Tên đăng nhập</label>
+                    <input type="text" id="login-username" placeholder="Nhập username" autocomplete="on">
+                </div>
+                <div class="form-group">
+                    <label>Mật khẩu</label>
+                    <input type="password" id="login-password" placeholder="Nhập mật khẩu">
+                    <p class="error-message hidden" id="login-error-msg">Sai tên đăng nhập hoặc mật khẩu</p>
+                </div>
+                <button type="submit" class="lab-button primary full-width">Đăng nhập</button>
+                <p class="auth-switch">Chưa có tài khoản? <a href="#" id="show-register">Đăng ký ngay</a></p>
+            </form>
+
+            <form id="register-form" class="hidden">
+                <div class="form-group">
+                    <label>Tên đăng nhập mới</label>
+                    <input type="text" id="reg-username" placeholder="Chọn username" autocomplete="off">
+                    <p class="error-message hidden" id="reg-user-error">Tên đăng nhập này đã tồn tại</p>
+                </div>
+                <div class="form-group">
+                    <label>Mật khẩu</label>
+                    <input type="password" id="reg-password" placeholder="Tạo mật khẩu">
+                </div>
+                <div class="form-group">
+                    <label>Nhập lại mật khẩu</label>
+                    <input type="password" id="reg-confirm-password" placeholder="Nhập lại mật khẩu">
+                    <p class="error-message hidden" id="reg-pass-error">Mật khẩu nhập lại không khớp</p>
+                </div>
+                <button type="submit" class="lab-button success full-width">Đăng ký</button>
+                <p class="auth-switch">Đã có tài khoản? <a href="#" id="show-login">Đăng nhập</a></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="main-app" class="hidden">
+        
+        <header class="main-navbar">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <img src="Images/logo.png" alt="Logo">
+                    <span>EduSystem</span>
+                </div>
+                <nav class="nav-menu">
+                    <ul>
+                        <li><a href="#" class="nav-link active">Tổng quan</a></li>
+                        <li><a href="#subjects-area" class="nav-link">Môn học</a></li>
+                        <li><a href="#features-area" class="nav-link">Tính năng</a></li>
+                        <li><a href="about/about.html" class="nav-link">Về chúng tôi</a></li>
+                        <li><a href="#" class="nav-link logout-btn" id="logout-btn" style="color: var(--danger);">Đăng xuất</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <div class="dashboard-container">
+            
+            <section class="welcome-banner">
+                <div class="welcome-text">
+                    <h1>Xin chào, <span id="user-display-name" style="color: var(--primary);">Học viên</span>! 👋</h1>
+                    <p>Hôm nay bạn muốn khám phá điều gì?</p>
+                    
+                    <div class="quote-box">
+                        <strong>Bạn có biết?</strong>
+                        <p id="daily-fact">Đang tải kiến thức...</p>
+                    </div>
+                </div>
+
+                <div class="progress-card">
+                    <h3>Tiến độ học tập tuần này</h3>
+                    
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span>Toán học</span>
+                            <span class="progress-count" id="math-count">0 lượt</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="fill math-progress" id="math-progress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span>Hóa học</span>
+                            <span class="progress-count" id="chemistry-count">0 lượt</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="fill chem-progress" id="chemistry-progress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span>Vật lý</span>
+                            <span class="progress-count" id="physics-count">0 lượt</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="fill phys-progress" id="physics-progress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-stats">
+                        <h4>Thống kê phiên hiện tại</h4>
+                        <div class="stat-item">
+                            <span>Tổng lượt truy cập:</span>
+                            <span class="stat-value" id="total-count">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Môn học ưa thích:</span>
+                            <span class="stat-value" id="fav-subject">Chưa có</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Hoàn thành mục tiêu:</span>
+                            <span class="stat-value" id="completion-rate">0%</span>
+                        </div>
+                    </div>
+                    
+                    <button class="lab-button secondary full-width" style="margin-top: 15px; font-size: 0.8rem;" onclick="resetProgress()">
+                        Reset tiến độ
+                    </button>
+                </div>
+            </section>
+
+            <section id="subjects-area" class="section-wrapper">
+                <div class="section-header">
+                    <h2>Trung tâm Thí nghiệm</h2>
+                    <p>Chọn phòng thí nghiệm ảo để bắt đầu học tập</p>
+                </div>
+                
+                <div class="cards-grid">
+                    <a href="math/math.html" class="subject-card">
+                        <div class="subject-icon math-bg"><img src="Images/math.png" alt="Toán"></div>
+                        <div class="card-content">
+                            <h3>Toán học</h3>
+                            <p>Vẽ đồ thị hàm số đa thức & khảo sát biến thiên.</p>
+                            <span class="btn-fake">Vào lớp &rarr;</span>
+                        </div>
+                    </a>
+                    
+                    <a href="chemistry/chemistry.html" class="subject-card">
+                        <div class="subject-icon chem-bg"><img src="Images/chemistry.png" alt="Hóa"></div>
+                        <div class="card-content">
+                            <h3>Hóa học</h3>
+                            <p>Phòng Lab ảo: Pha chế hóa chất & xem phản ứng.</p>
+                            <span class="btn-fake">Vào phòng Lab &rarr;</span>
+                        </div>
+                    </a>
+                    
+                    <a href="physics/physics.html" class="subject-card">
+                        <div class="subject-icon phys-bg"><img src="Images/physics.png" alt="Lý"></div>
+                        <div class="card-content">
+                            <h3>Vật lý</h3>
+                            <p>Mô phỏng chuyển động cơ học & Lực hấp dẫn.</p>
+                            <span class="btn-fake">Vào mô phỏng &rarr;</span>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <section id="features-area" class="section-wrapper bg-white">
+                <div class="section-header">
+                    <h2>Công nghệ Học tập</h2>
+                    <p>Trải nghiệm sự khác biệt của giáo dục tương tác 4.0</p>
+                </div>
+                <div class="features-row">
+                    <div class="feature-box">
+                        <div class="f-icon">🎮</div>
+                        <h4>Gamification</h4>
+                        <p>Học như chơi với các tương tác kéo thả sinh động.</p>
+                    </div>
+                    <div class="feature-box">
+                        <div class="f-icon">📊</div>
+                        <h4>Trực quan hóa</h4>
+                        <p>Biến số liệu khô khan thành biểu đồ màu sắc dễ hiểu.</p>
+                    </div>
+                    <div class="feature-box">
+                        <div class="f-icon">⚡</div>
+                        <h4>Real-time</h4>
+                        <p>Kết quả phản ứng và tính toán hiển thị ngay lập tức.</p>
+                    </div>
+                    <div class="feature-box">
+                        <div class="f-icon">🌐</div>
+                        <h4>Truy cập mọi nơi</h4>
+                        <p>Không cần cài đặt, chạy mượt mà ngay trên trình duyệt.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="cta-banner">
+                <div class="cta-content">
+                    <h2>Sẵn sàng chinh phục kiến thức?</h2>
+                    <p>Tham gia cùng hàng nghìn học viên khác ngay hôm nay.</p>
+                    <a href="#subjects-area" class="lab-button success large">Bắt đầu ngay</a>
+                </div>
+            </section>
+            
+            <footer class="dashboard-footer">
+                <div class="footer-cols">
+                    <div class="col">
+                        <strong>EduSystem</strong>
+                        <p>Nền tảng học tập tương tác đa môn hàng đầu.</p>
+                    </div>
+                    <div class="col">
+                        <strong>Liên kết</strong>
+                        <a href="#">Tài liệu hướng dẫn</a>
+                        <a href="#">Câu hỏi thường gặp</a>
+                    </div>
+                    <div class="col">
+                        <strong>Liên hệ</strong>
+                        <p>Email: admin@edusystem.com</p>
+                        <p>Hotline: 1900 1234</p>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    &copy; 2024 EduSystem. All rights reserved.
+                </div>
+            </footer>
+
+        </div>
+    </div>
+
+    <div id="success-modal" class="custom-modal hidden">
+        <div class="modal-content success">
+            <div class="icon-circle">✓</div>
+            <h3>Đăng ký thành công!</h3>
+            <p>Đang chuyển về trang đăng nhập...</p>
+        </div>
+    </div>
+
+    <div id="logout-modal" class="custom-modal hidden">
+        <div class="modal-content confirm">
+            <h3>Xác nhận đăng xuất</h3>
+            <p>Bạn có chắc chắn muốn thoát khỏi hệ thống?</p>
+            <div class="modal-actions">
+                <button id="cancel-logout" class="lab-button secondary">Hủy</button>
+                <button id="confirm-logout" class="lab-button danger">Đăng xuất</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
