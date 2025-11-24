@@ -17,6 +17,14 @@ class ChemistryLab {
 
     this.recipes = [
       {
+        inputs: { 'H': 12, 'O': 6, 'C': 6 },
+        product: 'C₆H₁₂O₆',
+        name: 'Glucose',
+        desc: 'Glucose - đường đơn (nguồn năng lượng chính cho tế bào)',
+        color: '#fdcb6e',
+        type: 'solid'
+      },
+      {
   inputs: { 'Na': 1, 'H': 1, 'C': 1, 'O': 3 },
   product: 'NaHCO₃',
   name: 'Sodium Bicarbonate',
@@ -87,7 +95,7 @@ class ChemistryLab {
   desc: 'Natri hiđroxit - xút ăn da, tẩy rửa, phòng thí nghiệm (rất bazơ, ăn mòn)',
   color: '#636e72',
   type: 'solid'
-}
+},
       {
         inputs: { 'H': 2, 'O': 1 },
         product: 'H₂O',
@@ -138,10 +146,22 @@ class ChemistryLab {
   bindEvents() {
     document.querySelectorAll('.element-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        const type = e.target.dataset.element;
-        e.target.style.transform = 'scale(0.95)';
-        setTimeout(() => e.target.style.transform = '', 100);
-        this.spawnAtom(type);
+        const btnEl = e.currentTarget;
+        const type = btnEl.dataset.element;
+        btnEl.style.transform = 'scale(0.95)';
+        setTimeout(() => btnEl.style.transform = '', 100);
+
+        // determine how many to spawn from the adjacent input (if present)
+        let count = 1;
+        const wrapper = btnEl.closest('.element-item');
+        if (wrapper) {
+          const input = wrapper.querySelector('.element-count[data-element="' + type + '"]');
+          if (input) count = Math.max(1, parseInt(input.value, 10) || 1);
+        }
+
+        for (let i = 0; i < count; i++) {
+          this.spawnAtom(type);
+        }
       });
     });
 
@@ -167,8 +187,28 @@ class ChemistryLab {
     this.labArea.appendChild(el);
 
     const containerRect = this.labArea.getBoundingClientRect();
-    const startX = (containerRect.width / 2) + (Math.random() * 40 - 20); 
-    const startY = -60;
+
+    // Spawn atoms across the beaker mouth at a fixed vertical height
+    const beaker = this.beaker || document.querySelector('.beaker-container');
+    let startX, startY;
+    if (beaker) {
+      const beakerRect = beaker.getBoundingClientRect();
+      const padding = 8; // keep atoms away from glass walls
+      const innerLeft = beakerRect.left - containerRect.left + padding;
+      const innerWidth = Math.max(0, beakerRect.width - padding * 2);
+
+      // ensure we don't place atoms outside inner area considering radius
+      const minX = innerLeft + this.atomRadius;
+      const maxX = innerLeft + Math.max(this.atomRadius, innerWidth - this.atomRadius);
+      startX = minX + Math.random() * Math.max(0, maxX - minX);
+
+      // fixed spawn height near beaker rim (relative to container)
+      startY = beakerRect.top - containerRect.top + 18;
+    } else {
+      // fallback to previous behaviour
+      startX = (containerRect.width / 3) + (Math.random() * containerRect.width - 20);
+      startY = -60;
+    }
 
     const targetY = containerRect.height - 100 - (Math.random() * 100);
 
@@ -422,29 +462,170 @@ class ChemistryLab {
       }
     }
 
-    const centerX = this.labArea.clientWidth / 2;
-    const centerY = this.labArea.clientHeight - 150;
+    // choose a merge point inside the liquid (or center fallback)
+    const containerRect = this.labArea.getBoundingClientRect();
+    const liquidEl = this.liquid || (this.beaker && this.beaker.querySelector('.liquid'));
+    let mergeX, mergeY;
+    if (liquidEl) {
+      const liquidRect = liquidEl.getBoundingClientRect();
+      const padding = 12;
+      const innerLeft = liquidRect.left - containerRect.left + padding;
+      const innerTop = liquidRect.top - containerRect.top + padding;
+      const innerWidth = Math.max(20, liquidRect.width - padding * 2);
+      const innerHeight = Math.max(20, liquidRect.height - padding * 2);
+      mergeX = innerLeft + Math.random() * innerWidth;
+      mergeY = innerTop + Math.random() * innerHeight;
+    } else {
+      mergeX = containerRect.width / 2;
+      mergeY = containerRect.height - 150;
+    }
 
-    reactants.forEach(atom => {
-      atom.isDragging = true; 
-      
+    // animate each reactant flying through the air to the merge point
+    // slower and more circular (black-hole) flight
+    const baseDelay = 180; // ms between each atom start (stagger)
+    const transformDur = 2200; // ms movement duration (slower flight)
+    const opacityDur = 180; // ms fade after arrival (shorter so merge happens quicker)
+
+    const animPromises = reactants.map((atom, i) => new Promise((resolve) => {
+      atom.isDragging = true;
+
       const idx = this.atoms.indexOf(atom);
       if (idx > -1) this.atoms.splice(idx, 1);
 
-      atom.el.style.transition = 'all 0.5s ease-in';
-      atom.el.style.transform = `translate(${centerX - 30}px, ${centerY - 30}px) scale(0.1)`;
-      atom.el.style.opacity = 0;
+      const delay = i * baseDelay;
 
-      setTimeout(() => atom.el.remove(), 500);
-    });
+      // compute start (current) and end (merge) positions in px for the element transform
+      const startTX = atom.x - this.atomRadius;
+      const startTY = atom.y - this.atomRadius;
+      const endTX = mergeX - this.atomRadius;
+      const endTY = mergeY - this.atomRadius;
 
-    setTimeout(() => {
-      this.spawnProduct(recipe, centerX, centerY);
+      // spiral / black-hole path: parametric spiral toward merge point
+      const dx = startTX - endTX;
+      const dy = startTY - endTY;
+      const startR = Math.sqrt(dx * dx + dy * dy);
+      let startAngle = Math.atan2(startTY - endTY, startTX - endTX);
+      // spins: fewer rotations for more circular paths, with random sign
+      const spin = (Math.random() > 0.5 ? 1 : -1) * (Math.PI * (0.8 + Math.random() * 0.9));
+
+      const steps = 40; // higher resolution keyframes for smoother spiral motion
+      const keyframes = [];
+      const positions = []; // store numeric positions for sparks
+      for (let s = 0; s <= steps; s++) {
+        const t = s / steps; // 0..1
+        // smooth radius interpolation for a natural pull-in
+        const rt = startR * (1 - Math.pow(t, 0.95));
+        const angleT = startAngle + spin * t;
+        const px = endTX + Math.cos(angleT) * rt;
+        const py = endTY + Math.sin(angleT) * rt;
+        const scale = 1 - 0.35 * t;
+        // rotation increases with t
+        const rot = Math.round((spin * t) * (180 / Math.PI) + (Math.random() - 0.5) * 22);
+        keyframes.push({ transform: `translate(${px}px, ${py}px) scale(${scale}) rotate(${rot}deg)`, offset: t });
+        positions.push({ x: px, y: py, offset: t, scale });
+      }
+
+      // create multiple rainbow sparks to form a clearer trail (they will lag behind the atom)
+      const sparks = [];
+      const sparkCount = 6;
+      for (let k = 0; k < sparkCount; k++) {
+        const sp = document.createElement('div');
+        // alternate sizes for depth
+        sp.className = 'flight-spark' + (k % 3 === 1 ? ' small' : k % 3 === 2 ? ' tiny' : '');
+        // set rainbow hue based on atom index and spark index
+        const hue = Math.round((i * 50 + k * 60 + Math.random() * 40) % 360);
+        sp.style.background = `hsl(${hue}, 90%, 60%)`;
+        sp.style.color = sp.style.background;
+        sp.style.boxShadow = `0 0 28px ${sp.style.background}, 0 0 12px ${sp.style.background}`;
+        this.labArea.appendChild(sp);
+        sparks.push(sp);
+      }
+
+      const anim = atom.el.animate(keyframes, {
+        duration: transformDur,
+        easing: 'cubic-bezier(0.22,0.9,0.3,1)',
+        delay: delay,
+        fill: 'forwards'
+      });
+
+      // Instead of an SVG ribbon trail, use larger, clearer rainbow sparks that follow behind the atom.
+      // Increase sparkle count and make them more visible (bigger, stronger glow) and animate with same easing.
+      const hueBase = Math.round((i * 50) % 360);
+      // adjust spark visuals
+      sparks.forEach((sp, k) => {
+        // bigger sizes for clearer effect
+        const size = 18 - (k % 3) * 4; // 18,14,10
+        sp.style.width = `${size}px`;
+        sp.style.height = `${size}px`;
+        sp.style.opacity = '0.95';
+        sp.style.zIndex = 80; // behind atoms
+        sp.style.borderRadius = '50%';
+        // stronger glow
+        sp.style.boxShadow = `0 0 ${18 + size}px ${sp.style.background}, 0 0 ${8 + size/2}px ${sp.style.background}`;
+        // color variation
+        const hue = Math.round((hueBase + k * 40 + Math.random() * 30) % 360);
+        sp.style.background = `hsl(${hue}, 95%, 60%)`;
+        sp.style.backgroundColor = sp.style.background;
+        this.labArea.appendChild(sp); // ensure appended (was already appended earlier)
+      });
+
+      // animate sparks along the same spiral but lagging slightly; shorten duration so they catch up faster
+      sparks.forEach((sp, k) => {
+        const lagSteps = Math.min(4, 1 + k); // further reduce lag so sparks stay very close to atom
+        const offsetKeyframes = positions.map((pos, idx) => {
+          const offT = pos.offset;
+          const srcIdx = Math.max(0, idx - lagSteps);
+          const src = positions[srcIdx];
+          const px = src.x + Math.sin(k + offT * Math.PI * 2) * 2 + (k - sparks.length/2) * 2.2;
+          const py = src.y + Math.cos(k + offT * Math.PI * 2) * 2 + (k - sparks.length/2) * 2.2;
+          const op = Math.max(0, 1 - offT * (0.9 + k * 0.02));
+          const sc = Math.max(0.2, 1.1 - k * 0.12 - offT * 0.45);
+          return { transform: `translate(${px}px, ${py}px) scale(${sc})`, opacity: op, offset: offT };
+        });
+        const sparkDur = Math.max(220, Math.round(transformDur * 0.45));
+        const sparkAnim = sp.animate(offsetKeyframes, { duration: sparkDur, easing: 'cubic-bezier(0.22,0.9,0.3,1)', delay: Math.max(0, delay + k * 8), fill: 'forwards' });
+        sparkAnim.onfinish = () => {
+          try { if (sp && sp.remove) sp.remove(); } catch (e) {}
+        };
+      });
+
       
+
+      anim.onfinish = () => {
+        // remove sparks (they may have finished earlier)
+        sparks.forEach(s => { try { if (s && s.remove) s.remove(); } catch (e) {} });
+        // fade atom then resolve
+        const fade = atom.el.animate([
+          { opacity: 1 },
+          { opacity: 0 }
+        ], { duration: opacityDur, fill: 'forwards' });
+        fade.onfinish = () => {
+          if (atom.el && atom.el.remove) atom.el.remove();
+          resolve();
+        };
+      };
+    }));
+
+    // wait for all atom flight animations to complete, then show merge pulse and spawn product
+    Promise.all(animPromises).then(() => {
+      // create merge pulse (duration tied to movement duration)
+      const pulse = document.createElement('div');
+      pulse.className = 'merge-pulse';
+      pulse.style.left = `${mergeX}px`;
+      pulse.style.top = `${mergeY}px`;
+      pulse.style.background = recipe.color || '#ffffff';
+      pulse.style.animation = `mergePulse ${Math.max(transformDur, 600)}ms cubic-bezier(0.2,0.8,0.2,1) forwards`;
+      this.labArea.appendChild(pulse);
+
+      setTimeout(() => pulse.remove(), Math.max(transformDur, 600) + 80);
+
+      // spawn the product exactly at merge point
+      this.spawnProduct(recipe, mergeX, mergeY);
+
       if (recipe.type === 'liquid') {
         this.liquid.style.background = `linear-gradient(to bottom, ${recipe.color}aa, ${recipe.color})`;
       }
-    }, 500);
+    });
   }
 
   spawnProduct(recipe, x, y) {
@@ -455,6 +636,26 @@ class ChemistryLab {
         <div style="font-size: 1.5rem; color: ${recipe.color}">${recipe.product}</div>
         <div style="font-size: 0.8rem; font-weight: normal; color: #333">${recipe.name}</div>
       </div>`;
+    // if x/y not provided, choose a random position inside the liquid area
+    const containerRect = this.labArea.getBoundingClientRect();
+    const liquidEl = this.liquid || (this.beaker && this.beaker.querySelector('.liquid'));
+    if (typeof x === 'undefined' || typeof y === 'undefined') {
+      if (liquidEl) {
+        const liquidRect = liquidEl.getBoundingClientRect();
+        const padding = 12; // keep product away from edges
+        const innerLeft = liquidRect.left - containerRect.left + padding;
+        const innerTop = liquidRect.top - containerRect.top + padding;
+        const innerWidth = Math.max(20, liquidRect.width - padding * 2);
+        const innerHeight = Math.max(20, liquidRect.height - padding * 2);
+
+        x = innerLeft + Math.random() * innerWidth + innerWidth / 2 - innerWidth / 2;
+        y = innerTop + Math.random() * innerHeight + innerHeight / 2 - innerHeight / 2;
+      } else {
+        x = containerRect.width / 2;
+        y = containerRect.height - 150;
+      }
+    }
+
     product.style.left = `${x - 60}px`;
     product.style.top = `${y - 40}px`;
     product.style.zIndex = 200;
