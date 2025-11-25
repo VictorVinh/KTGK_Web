@@ -38,7 +38,9 @@ class MathGraph {
 
     this.selectedPoints = []; // Mảng lưu các điểm được chọn
     this.clickRadius = 10; // Bán kính để chọn điểm
+    this.clickTolerancePx = 6; // Khoảng cách pixel tối đa để coi là click chính xác lên đồ thị
     
+    this.scaleStep = 1; // Tỷ lệ grid (1, 2, 5, 10, ...)
     this.isFullscreen = false;
   }
 
@@ -132,6 +134,24 @@ class MathGraph {
       this.draw();
     });
 
+    const scaleStepInput = document.getElementById('scale-step');
+    if (scaleStepInput) {
+      scaleStepInput.addEventListener('change', () => {
+        const value = parseFloat(scaleStepInput.value);
+        if (!isNaN(value) && value > 0) {
+          this.scaleStep = value;
+          this.draw();
+        }
+      });
+      scaleStepInput.addEventListener('input', () => {
+        const value = parseFloat(scaleStepInput.value);
+        if (!isNaN(value) && value > 0) {
+          this.scaleStep = value;
+          this.draw();
+        }
+      });
+    }
+
     document.getElementById('fullscreen-btn').addEventListener('click', () => {
       this.toggleFullscreen();
     });
@@ -204,10 +224,7 @@ class MathGraph {
     });
 
     // Mouse wheel for zooming
-    this.canvas.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      this.handleZoom(e);
-    }, { passive: false });
+    // Mouse wheel zooming removed per request (disabled)
 
     // Click chuột trái (button 0) để chọn điểm trên đồ thị
     this.canvas.addEventListener('click', (e) => {
@@ -229,19 +246,28 @@ class MathGraph {
       //Xóa điểm đó
       this.selectedPoints.splice(clickedPointIndex, 1);
     } else {
-      // Chuyển đổi tọa độ click sang tọa độ riel
+      // Chuyển đổi tọa độ click sang tọa độ thực (world)
       const worldX = this.screenToWorldX(clickX);
-      
       const worldY = this.evaluatePolynomial(worldX);
-      
+
+      // Nếu y hợp lệ, kiểm tra xem vị trí click có gần đồ thị hay không
       if (isFinite(worldY)) {
-        this.selectedPoints.push({
-          x: worldX,
-          y: worldY,
-          screenX: clickX,
-          screenY: clickY,
-          type: 'click' // Đánh dấu điểm được chọn bằng click
-        });
+        const [sxCurve, syCurve] = this.worldToScreen(worldX, worldY);
+
+        // Khoảng cách pixel từ click đến điểm trên đồ thị tại cùng x
+        const distToCurve = Math.hypot(clickX - sxCurve, clickY - syCurve);
+
+        // Chỉ thêm điểm khi click đủ gần đồ thị (tránh chiếu dọc khi click ở chỗ khác)
+        if (distToCurve <= this.clickTolerancePx) {
+          this.selectedPoints.push({
+            x: worldX,
+            y: worldY,
+            screenX: sxCurve,
+            screenY: syCurve,
+            type: 'click' // Đánh dấu điểm được chọn bằng click
+          });
+        }
+        // Nếu muốn, có thể thêm phản hồi cho người dùng khi click không chính xác.
       }
     }
     
@@ -598,7 +624,8 @@ class MathGraph {
       step = magnitude * 2;
     }
     
-    return step;
+    // Áp dụng tỷ lệ từ input
+    return step * this.scaleStep;
   }
 
   formatTickLabel(value) {
