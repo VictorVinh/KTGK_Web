@@ -264,3 +264,15 @@
     display: flex;
     flex-direction: column;
 }
+.hello-text {
+    opacity: 0;
+    margin-top: 10px;
+    font-size: 1rem;
+    color: var(--primary);
+    transition: opacity 0.3s ease;
+    font-weight: 600;
+}
+
+.team-card:hover .hello-text {
+    opacity: 1;
+}
