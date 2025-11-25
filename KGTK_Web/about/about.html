@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Về chúng tôi - Hệ thống học tập</title>
+    <link rel="icon" type="image/png" href="../Images/pixels.png" />
+    <link rel="stylesheet" href="../universal.css" />
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="about.css" />
+    
+    <script src="../auth/auth.js"></script>
+    <script src="about.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = localStorage.getItem('currentUser');
+            const authOverlay = document.getElementById('auth-overlay');
+            const mainApp = document.getElementById('main-app');
+            
+            if (currentUser) {
+                authOverlay.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+                AboutModule.init();
+            } else {
+                alert("Vui lòng đăng nhập trước!");
+                window.location.href = '../index.html';
+            }
+        });
+    </script>
+</head>
+<body>
+
+    <div id="auth-overlay" class="auth-overlay">
+        </div>
+
+    <div id="main-app" class="hidden">
+        <header class="main-navbar">
+            <div class="nav-container">
+                <div class="nav-brand" onclick="window.location.href='../index.html'">
+                    <img src="../Images/logo.png" alt="Logo">
+                    <span>EduSystem</span>
+                </div>
+                <nav class="nav-menu">
+                    <ul>
+                        <li><a href="../index.html" class="nav-link">Trang chủ</a></li>
+                        <li><a href="../index.html#subjects-area" class="nav-link">Môn học</a></li>
+                        <li><a href="../index.html#features-area" class="nav-link">Tính năng</a></li>
+                        <li><a href="#" class="nav-link active">Về chúng tôi</a></li>
+                        <li><a href="#" class="nav-link logout-btn" id="logout-btn" style="color: var(--danger);">Đăng xuất</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <div class="app-container">
+            <div class="subject-content" style="background: transparent; box-shadow: none;">
+                <div class="about-container fade-in" style="background: white; border-radius: 20px; box-shadow: var(--shadow-lg); padding: 40px;">
+                    <div class="about-header">
+                        <h1>Về Hệ thống học tập đa môn</h1>
+                        <p class="subtitle">Khơi dậy niềm đam mê khoa học thông qua công nghệ tương tác</p>
+                    </div>
+
+                    <div class="about-section">
+                        <div class="about-image">
+                            <img src="../Images/logo.png" alt="Mission" style="max-height: 250px; object-fit: contain;">
+                        </div>
+                        <div class="about-text">
+                            <h2>Sứ mệnh của chúng tôi</h2>
+                            <p>
+                                EduSystem được xây dựng với niềm tin rằng kiến thức không nên chỉ nằm trên giấy. 
+                                Chúng tôi biến những phương trình toán học khô khan, những phản ứng hóa học trừu tượng 
+                                thành các trải nghiệm tương tác trực quan.
+                            </p>
+                            <p>
+                                Mục tiêu của chúng tôi là tạo ra một môi trường học tập an toàn, miễn phí và thú vị, 
+                                nơi học sinh có thể tự do khám phá và sai lầm mà không lo rủi ro.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="stats-counter">
+                        <div class="stat-item">
+                            <span class="count" data-target="3">0</span>
+                            <span class="label">Môn học</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="count" data-target="50">0</span>+
+                            <span class="label">Công thức</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="count" data-target="5000">0</span>+
+                            <span class="label">Dòng code</span>
+                        </div>
+                    </div>
+
+                    <div class="team-section">
+                        <h2>Đội ngũ phát triển</h2>
+                        <div class="team-grid">
+                            <div class="team-card">
+                                <img src="../Images/LMK.jpg" alt="Lê Minh Khôi" class="avatar">
+                                <h3>Lê Minh Khôi</h3>
+                                <p>Culi 1</p>
+                                <div class="social-links">
+                                    <a href="https://github.com/imnotLeMiKu">GitHub</a>
+                                    <a href="https://www.facebook.com/lmk4508">Facebook</a>
+                                </div>
+                            </div>
+                            <div class="team-card">
+                                <img src="../Images/Hòn.jpg" alt="Trịnh Minh Đức Hoàng" class="avatar">
+                                <h3>Trịnh Minh Đức Hoàng</h3>
+                                <p>Culi 2 (Đệ tử Trịnh Trần Phương Tuấn)</p>
+                                <div class="social-links">
+                                    <a href="https://github.com/Emiya2902">GitHub</a>
+                                    <a href="#">Facebook</a>
+                                </div>
+                            </div>
+                            <div class="team-card">
+                                <img src="../Images/Vinh.jpg" alt="Trần Tiến Vinh" class="avatar">
+                                <h3>Trần Tiến Vinh</h3>
+                                <p>Địa chủ</p>
+                                <div class="social-links">
+                                    <a href="https://github.com/VictorVinh">GitHub</a>
+                                    <a href="https://www.facebook.com/vinh.tran.791410/">Facebook</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="contact-section">
+                        <h2>Liên hệ & Góp ý</h2>
+                        <p>Bạn có ý tưởng để cải thiện hệ thống? Chúng tôi luôn lắng nghe.</p>
+                        <button class="lab-button primary large contact-btn" onclick="window.location.href='mailto:baanhlonvippro@gmail.com'">Gửi Email Ngay</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="dashboard-footer">
+            <div class="footer-cols">
+                <div class="col">
+                    <strong>EduSystem</strong>
+                    <p>Nền tảng học tập tương tác đa môn hàng đầu.</p>
+                </div>
+                <div class="col">
+                    <strong>Liên kết</strong>
+                    <a href="../index.html">Tài liệu hướng dẫn</a>
+                    <a href="#">Câu hỏi thường gặp</a>
+                </div>
+                <div class="col">
+                    <strong>Liên hệ</strong>
+                    <p>Email: baanhlonvippro@gmail.com</p>
+                    <p>Hotline: 19001036</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2024 EduSystem. All rights reserved.
+            </div>
+        </footer>
+    </div>
+
+    <div id="logout-modal" class="custom-modal hidden">
+        <div class="modal-content confirm">
+            <h3>Xác nhận đăng xuất</h3>
+            <p>Bạn có chắc chắn muốn thoát khỏi hệ thống?</p>
+            <div class="modal-actions">
+                <button id="cancel-logout" class="lab-button secondary">Hủy</button>
+                <button id="confirm-logout" class="lab-button danger">Đăng xuất</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

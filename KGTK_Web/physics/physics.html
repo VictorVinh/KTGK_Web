@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Vật lý - Hệ thống học tập</title>
+    <link rel="icon" type="image/png" href="../Images/pixels.png" />
+    <link rel="stylesheet" href="../universal.css" />
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="physics.css" />
+
+    <script src="../progress-tracker.js"></script>
+    <script src="../auth/auth.js"></script>
+    <script src="../subject-loader.js"></script>
+    <script src="physics.js"></script>
+    <script>initSubjectPage('physics');</script>
+</head>
+<body>
+
+    <div id="auth-overlay" class="auth-overlay">
+        <div class="auth-card" id="auth-box">
+            <div class="auth-header">
+                <img src="../Images/logo.png" alt="Logo" class="auth-logo">
+                <h2 id="auth-title">Đăng nhập</h2>
+                <p id="auth-subtitle">Chào mừng bạn quay trở lại!</p>
+            </div>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label>Tên đăng nhập</label>
+                    <input type="text" id="login-username" placeholder="Nhập username" autocomplete="on">
+                </div>
+
+                <div class="form-group">
+                    <label>Mật khẩu</label>
+                    <input type="password" id="login-password" placeholder="Nhập mật khẩu">
+                    <p class="error-message hidden" id="login-error-msg">Sai tên đăng nhập hoặc mật khẩu</p>
+                </div>
+
+                <button type="submit" class="lab-button primary full-width">Đăng nhập</button>
+                <p class="auth-switch">Chưa có tài khoản? <a href="#" id="show-register">Đăng ký ngay</a></p>
+            </form>
+
+            <form id="register-form" class="hidden">
+                <div class="form-group">
+                    <label>Tên đăng nhập mới</label>
+                    <input type="text" id="reg-username" placeholder="Chọn username" autocomplete="off">
+                    <p class="error-message hidden" id="reg-user-error">Tên đăng nhập này đã tồn tại</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Mật khẩu</label>
+                    <input type="password" id="reg-password" placeholder="Tạo mật khẩu">
+                </div>
+
+                <div class="form-group">
+                    <label>Nhập lại mật khẩu</label>
+                    <input type="password" id="reg-confirm-password" placeholder="Nhập lại mật khẩu">
+                    <p class="error-message hidden" id="reg-pass-error">Mật khẩu nhập lại không khớp</p>
+                </div>
+
+                <button type="submit" class="lab-button success full-width">Đăng ký</button>
+                <p class="auth-switch">Đã có tài khoản? <a href="#" id="show-login">Đăng nhập</a></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="main-app" class="hidden">
+        <header class="main-navbar">
+            <div class="nav-container">
+                <div class="nav-brand" onclick="window.location.href='../index.html'">
+                    <img src="../Images/logo.png" alt="Logo">
+                    <span>Hệ thống học tập</span>
+                </div>
+                <nav class="nav-menu">
+                    <ul>
+                        <li><a href="../index.html" class="nav-link">Trang chủ</a></li>
+                        <li><a href="../math/math.html" class="nav-link">Toán học</a></li>
+                        <li><a href="../chemistry/chemistry.html" class="nav-link">Hóa học</a></li>
+                        <li><a href="physics.html" class="nav-link active">Vật lý</a></li>
+                        <li><a href="../about/about.html" class="nav-link">Về chúng tôi</a></li>
+                        <li><a href="#" class="nav-link logout-btn" id="logout-btn" style="color: var(--danger);">Đăng xuất</a></li>
+                    
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <div class="app-container">
+            <div class="subject-content">
+                <div class="physics-lab">
+                    <h2>Phòng Thí Nghiệm Vật Lý</h2>
+                    
+                    <div class="simulation-tabs">
+                        <button class="tab-button active" data-tab="pendulum">Con Lắc Đơn</button>
+                        <button class="tab-button" data-tab="wave">Sóng Dừng</button>
+                    </div>
+                    
+                    <div id="pendulum-tab" class="tab-content active">
+                        <div class="simulation-container">
+                            <div class="simulation-area">
+                                <div class="pendulum-container">
+                                    <canvas id="pendulum-canvas"></canvas>
+                                    <div class="pendulum-controls">
+                                        <div class="control-group">
+                                            
+                                            <label for="pendulum-length">Chiều dài dây (m):</label>
+                                            <input type="range" id="pendulum-length" min="0.5" max="3" step="0.1" value="1.5">
+                                            <span id="length-value">1.5</span>
+                                        </div>
+
+                                        <div class="control-group">
+                                            <label for="pendulum-angle">Góc ban đầu (°):</label>
+                                            <input type="range" id="pendulum-angle" min="5" max="80" step="5" value="30">
+                                            <span id="angle-value">30</span>
+                                        </div>
+
+                                        <div class="control-group">
+                                            <label for="pendulum-mass">Khối lượng (kg):</label>
+                                            <input type="range" id="pendulum-mass" min="0.1" max="2" step="0.1" value="1">
+                                            <span id="mass-value">1</span>
+                                        </div>
+
+                                        <div class="control-group">
+                                            <label for="pendulum-gravity">Gia tốc trọng trường (m/s²):</label>
+                                            <input type="range" id="pendulum-gravity" min="1" max="15" step="0.5" value="9.8">
+                                            <span id="gravity-value">9.8</span>
+                                        </div>
+
+                                        <div class="control-group">
+                                            <label for="pendulum-period">Chu kỳ T (s):</label>
+                                            <input type="range" id="pendulum-period" min="1" max="5" step="0.1" value="2.5">
+                                            <span id="period-display">2.5</span>
+                                        </div>
+
+                                        <div class="control-group">
+                                            <label for="pendulum-frequency">Tần số f (Hz):</label>
+                                            <input type="range" id="pendulum-frequency" min="0.2" max="1" step="0.05" value="0.4">
+                                            <span id="frequency-display">0.4</span>
+                                        </div>
+
+                                        <div class="control-group">
+                                            <label for="pendulum-angular-frequency">Tần số góc w (rad/s):</label>
+                                            <input type="range" id="pendulum-angular-frequency" min="1" max="5" step="0.1" value="2.5">
+                                            <span id="angular-frequency-display">2.5</span>
+                                        </div>
+
+                                        <div class="control-buttons">
+                                            <button id="pendulum-start" class="lab-button success">Bắt đầu</button>
+                                            <button id="pendulum-pause" class="lab-button secondary">Tạm dừng</button>
+                                            <button id="pendulum-reset" class="lab-button danger">Đặt lại</button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="pendulum-info">
+                                    <h3>Thông tin dao động</h3>
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <span class="info-label">Chu kỳ (T):</span>
+                                            <span id="period-value" class="info-value">0.00 s</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Tần số (f):</span>
+                                            <span id="frequency-value" class="info-value">0.00 Hz</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Tần số góc (w):</span>
+                                            <span id="angular-frequency-value" class="info-value">0.00 rad/s</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Góc hiện tại:</span>
+                                            <span id="current-angle-value" class="info-value">0.00°</span>
+                                        </div>
+                                    </div>
+                                    <div class="energy-display">
+                                        <h4>Phân bố năng lượng</h4>
+                                        <div class="energy-comparison">
+                                            <div class="energy-bars">
+                                                <div class="energy-bar">
+                                                    <span class="energy-label">Thế năng:</span>
+                                                    <div class="energy-bar-container">
+                                                        <div class="energy-fill" id="potential-energy" style="width: 100%"></div>
+                                                    </div>
+                                                    <span class="energy-percentage" id="potential-percent">100%</span>
+                                                </div>
+                                                <div class="energy-bar">
+                                                    <span class="energy-label">Động năng:</span>
+                                                    <div class="energy-bar-container">
+                                                        <div class="energy-fill" id="kinetic-energy" style="width: 0%"></div>
+                                                    </div>
+                                                    <span class="energy-percentage" id="kinetic-percent">0%</span>
+                                                </div>
+                                                <div class="energy-bar">
+                                                    <span class="energy-label">Cơ năng:</span>
+                                                    <div class="energy-bar-container">
+                                                        <div class="energy-fill" id="total-energy" style="width: 100%"></div>
+                                                    </div>
+                                                    <span class="energy-percentage" id="total-percent">100%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="energy-explanation">
+                                            <p><strong>Giải thích:</strong> Trong con lắc lý tưởng, cơ năng được bảo toàn. 
+                                            Thế năng và động năng chuyển hóa lẫn nhau nhưng tổng luôn không đổi.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="theory-section">
+                                <h3>Lý thuyết Con Lắc Đơn</h3>
+                                <div class="theory-content">
+                                    <p>Con lắc đơn là một hệ dao động điều hòa khi góc lệch nhỏ (&lt; 10°).</p>
+                                    <div class="formula">
+                                        <p>Chu kỳ dao động: <strong>T = 2π/w  (s)</strong></p>
+                                        <p>Tần số: <strong>f = 1/T = w/(2π)  (Hz)</strong></p>
+                                        <p>Tần số góc: <strong>w (rad/s)</strong></p>
+                                    </div>
+                                    <p>Trong đó:</p>
+                                    <ul>
+                                        <li><strong>L</strong>: Chiều dài dây treo (m)</li>
+                                        <li><strong>g</strong>: Gia tốc trọng trường (m/s²)</li>
+                                        <li><strong>T</strong>: Chu kỳ dao động (s)</li>
+                                        <li><strong>f</strong>: Tần số dao động (Hz)</li>
+                                        <li><strong>w</strong>: Tần số góc (rad/s)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="wave-tab" class="tab-content">
+                        <div class="simulation-container">
+                            <div class="simulation-area">
+                                <div class="wave-container">
+                                    <canvas id="wave-canvas"></canvas>
+                                    <div class="wave-controls">
+                                        <div class="control-group">
+                                            <label for="wave-frequency">Tần số (Hz):</label>
+                                            <input type="range" id="wave-frequency" min="0.5" max="5" step="0.1" value="1.5">
+                                            <span id="wave-freq-display">1.5</span>
+                                        </div>
+                                        <div class="control-group">
+                                            <label for="wave-amplitude">Biên độ (cm):</label>
+                                            <input type="range" id="wave-amplitude" min="1" max="10" step="0.5" value="5">
+                                            <span id="amplitude-display">5</span>
+                                        </div>
+                                        <div class="control-group">
+                                            <label for="wave-harmonic">Bó sóng (n):</label>
+                                            <input type="range" id="wave-harmonic" min="1" max="6" step="1" value="1">
+                                            <span id="harmonic-display">1</span>
+                                        </div>
+                                        <div class="control-group">
+                                            <label for="wave-tension">Lực căng dây:</label>
+                                            <input type="range" id="wave-tension" min="1" max="10" step="1" value="5">
+                                            <span id="tension-display">5</span>
+                                        </div>
+                                        <div class="control-buttons">
+                                            <button id="wave-start" class="lab-button success">Bắt đầu</button>
+                                            <button id="wave-pause" class="lab-button secondary">Tạm dừng</button>
+                                            <button id="wave-reset" class="lab-button danger">Đặt lại</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="wave-info">
+                                    <h3>Thông tin sóng</h3>
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <span class="info-label">Bước sóng λ:</span>
+                                            <span id="wavelength-value" class="info-value">0.00 m</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Vận tốc (v):</span>
+                                            <span id="velocity-value" class="info-value">0.00 m/s</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Tần số (f):</span>
+                                            <span id="wave-freq-value" class="info-value">0.00 Hz</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Số bụng sóng:</span>
+                                            <span id="antinodes-value" class="info-value">0</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Số nút sóng:</span>
+                                            <span id="nodes-value" class="info-value">0</span>
+                                        </div>
+                                    </div>
+                                    <div class="wave-nodes">
+                                        <h4>Vị trí nút sóng</h4>
+                                        <div id="nodes-positions" class="nodes-list">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="theory-section">
+                                <h3>Lý thuyết Sóng Dừng</h3>
+                                <div class="theory-content">
+                                    <p>Sóng dừng là kết quả của sự giao thoa giữa sóng tới và sóng phản xạ.</p>
+                                    <div class="formula">
+                                        <p>Điều kiện sóng dừng trên dây: <strong>L = n * (λ/2) (m)</strong></p>
+                                        <p>Tần số sóng dừng: <strong>f = (nv)/(2L) = w/(2π) (Hz)</strong></p>
+                                        <p>Vận tốc sóng: <strong>v = λf = λ/T (m/s)</strong></p>
+                                    </div>
+                                    <p>Trong đó:</p>
+                                    <ul>
+                                        <li><strong>L</strong>: Chiều dài dây (m)</li>
+                                        <li><strong>n</strong>: Số bó sóng (số nguyên)</li>
+                                        <li><strong>λ</strong>: Bước sóng (m)</li>
+                                        <li><strong>f</strong>: Tần số (Hz)</li>
+                                        <li><strong>v</strong>: Vận tốc sóng (m/s)</li>
+                                        <li><strong>T</strong>: Lực căng dây (N)</li>
+                                        <li><strong>μ</strong>: Mật độ khối lượng dây (kg/m)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="dashboard-footer">
+        <div class="footer-cols">
+            <div class="col">
+                <strong>EduSystem</strong>
+                <p>Nền tảng học tập tương tác đa môn hàng đầu.</p>
+            </div>
+            <div class="col">
+                <strong>Liên kết</strong>
+                <a href="../index.html">Tài liệu hướng dẫn</a>
+                <a href="#">Câu hỏi thường gặp</a>
+            </div>
+            <div class="col">
+                <strong>Liên hệ</strong>
+                <p>Email: baanhlonvippro@gmail.com</p>
+                <p>Hotline: 19001036</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2024 EduSystem. All rights reserved.
+        </div>
+    </footer>
+
+    <div id="logout-modal" class="custom-modal hidden">
+        <div class="modal-content confirm">
+            <h3>Xác nhận đăng xuất</h3>
+            <p>Bạn có chắc chắn muốn thoát khỏi hệ thống?</p>
+            <div class="modal-actions">
+                <button id="cancel-logout" class="lab-button secondary">Hủy</button>
+                <button id="confirm-logout" class="lab-button danger">Đăng xuất</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
