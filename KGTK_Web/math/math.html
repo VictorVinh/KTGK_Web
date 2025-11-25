@@ -127,23 +127,20 @@
                             <input type='color' id='color' value='#60a5fa'>
                             </div>
                             <button id="draw" class="lab-button success">Vẽ đồ thị</button>
-                            <button id="reset-view" class="lab-button secondary">Đặt lại</button>
+                            <button id="reset-view" class="lab-button secondary" style="background-color: #28a745">Đặt lại</button>
                             <button id="theme" class="lab-button secondary">Đổi nền</button>
                         </div>
                         </div>
                     </div>
-
                     <div class="canvas-container">
                         <canvas id="plot"></canvas>
                         <div class="coordinates-display" id="coordinates">Tọa độ: (0, 0)</div>
-                        <div class="zoom-hint">Cuộn chuột để zoom</div>
-                        <div class="click-hint">Chuột trái: chọn điểm Chuột phải: di chuyển</div>
+                        <div class="click-hint">Giữ chuột phải để di chuyển</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
     <footer class="dashboard-footer">
         <div class="footer-cols">
             <div class="col">
@@ -165,7 +162,6 @@
             &copy; 2024 EduSystem. All rights reserved.
         </div>
     </footer>
-
     <div id="logout-modal" class="custom-modal hidden">
         <div class="modal-content confirm">
             <h3>Xác nhận đăng xuất</h3>
