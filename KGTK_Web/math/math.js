@@ -1,4 +1,4 @@
-class MathGraph {
+  class MathGraph {
   constructor() {
     this.canvas = null;
     this.ctx = null;
@@ -195,19 +195,6 @@ class MathGraph {
     this.canvas.addEventListener('mouseenter', () => {
       this.isMouseOnCanvas = true;
       this.canvas.style.cursor = 'crosshair';
-    });
-
-    // Mouse wheel for zooming
-    this.canvas.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      this.handleZoom(e);
-    }, { passive: false });
-
-    // Click chuột trái (button 0) để chọn điểm trên đồ thị
-    this.canvas.addEventListener('click', (e) => {
-      if (e.button === 0) { 
-        this.handleClick(e);
-      }
     });
   }
 
@@ -517,7 +504,8 @@ class MathGraph {
       step = magnitude * 2;
     }
     
-    return step;
+    // Ensure step is at least 1 for displaying integers
+    return Math.max(1, Math.round(step));
   }
 
   formatTickLabel(value) {
@@ -682,8 +670,6 @@ class MathGraph {
 
     this.drawAxes();
     this.drawGraph();
-    
-    this.drawSelectedPoints();
   }
 
   cleanup() {
